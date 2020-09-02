@@ -1,0 +1,204 @@
+
+##############################  Ansible playbook ##################################
+Install ansible on ubuntu 16.04LTS
+-> Personal Package Archives (PPA) enables you to upload Ubuntu source packages to be built and published as an apt repository by Launchpad.
+
+#sudo apt-add-repository ppa:ansible/ansible
+#sudo apt-get update
+#sudo apt-get install ansible.
+
+
+#vim /etc/ansible/hosts
+
+[webserver]
+172.31.19.29   ansible_ssh_user=ubuntu   ansible_ssh_private_key_file=/root/ganeshkey.pem 
+172.31.17.199   ansible_ssh_user=ubuntu   ansible_ssh_private_key_file=/root/ganeshkey.pem
+
+#ansible -m ping webservers --> to check target servers responce.
+
+#######################  Basic ansible palybook ##############################
+
+---
+- hosts: webserver
+  become: true
+  tasks:
+  - name: Install list of packages
+    apt: name={{item}} state=installed
+    with_items:
+       - apache2
+
+########################################################################################
+---
+- hosts: webserver
+  become: true
+  tasks:
+    - name: Installs tomcat8 webserver
+      apt: pkg=tomcat8 state=present update_cache=true
+      notify:
+        - starttomcat
+
+  handlers:
+    - name: starttomcat
+      service: name=tomcat8 state=started
+
+
+
+######################## Provision an EC2 Instance ##################################  
+
+
+---
+  - name: Provision an EC2 Instance
+    hosts: localhost
+    connection: localhost
+    gather_facts: False
+    tags: provisioning
+    # Necessary Variables for creating/provisioning the EC2 Instance
+    vars:
+      instance_type: t2.micro
+      security_group: webserverSG # Change the security group name here
+      image: ami-0e32ec5bc225539f5 # This is an AMI i created myself
+      keypair: gkawskey # This is one of my keys that i already have in AWS
+      region: us-east-2 # Change the Region
+      count: 1
+
+    # Task that will be used to Launch/Create an EC2 Instance
+    tasks:
+
+      - name: Create a security group
+        local_action:
+          module: ec2_group
+          name: "{{ security_group }}"
+          description: Security Group for webserver Servers
+          region: "{{ region }}"
+          rules:
+            - proto: tcp
+              from_port: 22
+              to_port: 22
+              cidr_ip: 0.0.0.0/0
+            - proto: tcp
+              from_port: 80
+              to_port: 80
+              cidr_ip: 0.0.0.0/0
+            - proto: tcp
+              from_port: 443
+              to_port: 443
+              cidr_ip: 0.0.0.0/0
+          rules_egress:
+            - proto: all
+              cidr_ip: 0.0.0.0/0
+        register: basic_firewall
+	  - name: Launch the new EC2 Instance
+        local_action: ec2
+                      group={{ security_group }}
+                      instance_type={{ instance_type}}
+                      image={{ image }}
+                      wait=true
+                      region={{ region }}
+                      keypair={{ keypair }}
+                      count={{count}}
+        register: ec2
+	  - name: Add tag to Instance(s)
+        local_action: ec2_tag resource={{ item.id }} region={{ region }} state=present
+        with_items: "{{ ec2.instances }}"
+        args:
+          tags:
+            Name: webserver
+		
+		
+############################  create s3 bucket ##########################################################
+
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - name: Create S3 test bucket.
+    local_action:
+      module: aws_s3
+      bucket: 'anisblebucket'
+      mode: create
+      region: 'eu-west-2'
+      mode: create
+
+  - name: Set tags to S3 test bucket.
+    local_action:
+      module: s3_bucket
+      name: 'anisblebucket'
+      region: 'eu-west-2'
+      versioning: yes
+      tags:
+        Name: anisblebucket
+        env: prod
+        created_by: Ansible
+		
+############################  Ansible Valut ###################################################################
+
+-> Ansible Vault is a feature of ansible that allows you to keep sensitive data such as passwords or keys in encrypted files rather than as plaintext in playbooks or roles.
+#ansible-vault create topsecret.yml --> create encrypted file using vault.
+#ansible-vault edit topsecret.yml --> To edit the vault file.
+#ansible-vault decrypt topsecret.yml --> To decrypt a file (back to plan text).
+#ansible-vault encrypt topsecret.yml --> To encrypt a file.
+#ansible-playbook topsecret.yml --ask-vault-pass --> To run a encrypt playbook. 
+
+
+##################### ad-hoc command ######################################
+-> An Ansible ad-hoc commands can be used to do some quick task to perform some simple operations through the command line.
+   An ad-hoc command is something that you might type in to do something really quick, but don’t want to save for later.
+   Small and quick tasks you can use ad-hoc commands instead of writing a playbooks.
+   
+-> Syntax of ad-hoc command.
+   command hostgroup module/options[arguments]
+   where :
+   command is ansible
+   host group - It specifies on what machines,task to be performed.
+   module or arguments - What actions to be performed.
+   
+Examples: 
+#ansible devopsgroup -a "uptime" -> To check uptime of list of host groups names.
+Here we have used -a option rather than using direct modules.This would execute a command 'uptime' on hostgroup ans will give you the output of uptime in the screen.
+
+# ansible all -m user -a 'name=monster password=$6$Xp/UtBpL$2e6tB1cH8cBXcMTHokUtqLEkuYIPLIzg2V6r20m.flVZz/Dmy32SpzSXW6H3YkMZOO0JGCp1oGb/.U0VyNND3/' --become
+Where:
+      -m is a option to use module.
+	    user is module name to manage the user accounts.
+	    -a is option to pass the arguments "name=ganesh password=ganesh"
+	  
+#ansible all -a "yum -y install httpd" --> with out using module 'yum' install 'httpd' package.
+#ansible all -m yum -a "name=httpd state=present" --> Using module yum install httpd package.
+
+File Transfer:-
+Copy module:
+#ansible devopsgroup -m copy -a "src=/root/test.sh dest=/tmp/"
+
+File module:
+#ansible all -m file -a "dest=/tmp/test.sh mode=777" -> Using the file module you can also modify the file properties on host.
+#ansible all -m file -a "dest=/tmp/ganeshdir  state=directory mode=755" -> You can also create directories and set permissions.
+#ansible all -m file -a "dest=/tmp/ganeshdir state=absent" -> You can also delete the directories.
+
+Managing Packages:
+#ansible all -m apt -a "name=apache2 state=present" --become --> Packages can also be maintained using  ansible there are yum and apt modules for that.
+#ansible all -m apt -a "name=apache2* state=absent" --become --> Ensure a package is not installed.
+
+Managing Services:
+#ansible webservers -m service -a "name=httpd state=started" --> Ensure a service is started on all webservers.
+#ansible webservers -m service -a "name=httpd state=restarted" --> Alternatively, restart a service on all webservers.
+# ansible webservers -m service -a "name=httpd state=stopped" --> Ensure a service is stopped.
+
+
+
+
+
+
+
+
+
+
+		
+	  
+			
+			
+			
+			
+			
+
+	  

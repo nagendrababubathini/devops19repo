@@ -1,0 +1,40 @@
+#############################  Monitor Memory and Disk Metrics for Amazon EC2 Linux Instance ########################
+
+-> AWS CloudWatch provides most of the monitoring Metrics by default.
+-> But it doesn’t have any metrics for memory utilization details and Disk space uses.
+
+Prerequisites:
+
+you will use the Perl scripts provided by AWS team, These scripts have some dependencies.
+Redhat Based Systems:
+   #sudo yum install perl-Switch perl-DateTime perl-Sys-Syslog perl-LWP-Protocol-https perl-Digest-SHA       
+   #sudo yum install zip unzip
+   
+Debian Based Systems:
+   #sudo apt-get update 
+   #sudo apt-get install unzip libwww-perl libdatetime-perl
+
+Download and Configure Script:
+
+#cd /opt
+#wget  http://aws-cloudwatch.s3.amazonaws.com/downloads/CloudWatchMonitoringScripts-1.2.1.zip
+#unzip CloudWatchMonitoringScripts-1.2.1.zip
+
+Now create credentails file with coping template file:
+
+cd /opt/aws-scripts-mon
+cp awscreds.template awscreds.conf
+Now, You need to add AWSAccessKeyId and AWSSecretKey of your AWS account. This will verify account ownership for the script. 
+
+Test and Schedule Scripts:
+
+Let’s use the following command to verify the connectivity between script and your AWS account.
+#./mon-put-instance-data.pl --mem-util --verify --verbose
+You can add the script to crontab to run on a regular interval to send data to your ec2 account. Edit crontab and add the following command to run on every 5 minutes.
+
+*/5 * * * * /opt/aws-scripts-mon/mon-put-instance-data.pl --mem-used-incl-cache-buff --mem-util --disk-space-util --disk-path=/ --from-cron
+
+Ref below links for more details:
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/mon-scripts.html
+
+

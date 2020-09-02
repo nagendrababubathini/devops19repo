@@ -1,0 +1,242 @@
+﻿
+-> Git is an open source, distributed version control system (VCS). It’s commonly used for source code management (SCM).
+-> Git is a free and open source distributed version control system designed to handle projects with speed and efficiency.
+GitHub : It is a web-based Git repository hosting service.GitHub offers all of the distributed revision control and source code management (S.C.M.) functionality of Git as well as adding its own features.
+
+. Git - Git is system for version control primarily used by programmers and others who writes code.
+      - It runs at the command line on your local machine.
+	    - It allows you to keep track of your files and modifications to those files in something called a repository (repo).
+	    - To track last five changes to the rep :#git log -5 
+	    - you can use it with a team of people who are working on the same project.
+	    - It's useful in team env because everyone can work independently on those files.
+	  
+ . Git Hub - Git HUb is website that allows you to upload your Git repositories online.
+           - It gives GUI for navigating your repos.
+		       - It gives other peoples navigate your repos.
+		       - Finally it makes repo collaboration easy.
+		  
+ . Then configure Git with the new user as follows:
+  #git config --global user.name "Your Name"
+	#git config --global user.email "you@example.com"
+
+ . Now verify Git configuration using following command:
+    #git config --list 
+	
+ . #git init is used to start using git on a project.
+   -> git init initialises (i.e. creates) a repository. Each project should be in its own repository.If you downloaded your project using git clone then you don't need to run git init again.
+
+ 
+##### what is .GIT ? ############################################################################
+   -> The .git folder contains all the information that is necessary for your project in version control and all the information about commits, remote repository address etc. 
+   -> All are present in this folder. It also contains a log which stores your commit history so that you can roll back to history.
+   -> This is one of the reasons git is so fast compared to svn or cvs - the entire repository is processed on the local hard disk without any network traffic.
+   
+   
+   
+-> git add : adds your modified files to the queue to be committed later. Files are not committed
+   git commit: commits the files that have been added and creates a new revision with a log... If you do not add any files, git will not commit anything. You can combine both actions with #git commit -a
+   git push : pushes your changes to the remote repository.
+   
+
+-> #git add --> selects changes
+   #git commit --> records changes LOCALLY
+   #git push --> shares changes to remote origin.
+   
+-> #git fetch: is the command that says "bring my local copy of the remote repository up to date." git fetch grabs changes from remote repository and puts it in your repository's object database.
+   #git log master..origin/master --> To check remote origin updates.
+   #git merge origin/master --> To update local repository to workstation.
+   #git pull: says "bring the changes in the remote repository where I keep my own code."
+		  
+
+############################ Git commands ###############################
+
+-> lists branches merged into master: #git branch --merged master
+-> lists branches merged into HEAD: #git branch --merged
+-> you can delete it locally: #git branch -d mybranch
+-> To check the branchs list :#git branch 
+
+
+############################################################################################################################
+Branch: Allows to working with the different versions of the same file as parallel. branch's are independed we have create diff branches like dev and prod to work on diff versions.
+
+#git log --all --decorate --oneline --graph : To check the head pointer.
+#alias graph="git log --all --decorate --oneline --graph" : To create alias
+
+#cat ~/.gitconfig --> if you want to add permanently follow below steps:
+# git config --global alias.gklogs 'log --all --decorate --oneline --graph'
+
+HEAD:  is a ref (reference point) to the currently checked out commit.
+       some times call symbolic pointer HEAD tell out terminal what we have checkout.
+
+Merge: 
+Fast-Forward-merge: Move branch directly to the master branch.
+3-way merge: not a direct path to merge master branch to merge branch.
+
+#git diff master..SDN : To check the two branchs diff
+
+#git branch --merged : Before delete the SDN(branch)merge to check which branch is merged to which one. 
+
+########### Basic master branch yml file ###############
+
+mgmt_ip: 10.0.0.1
+Vlans: 
+  red:
+    id: 10
+  blue:
+    id: 20
+ports:
+ 1: [ 20 ]
+ 2: [ 10 ]
+ 3: [ 10, 20 ] 
+ 
+################ Baisc SDN branch file #####################
+
+mgmt_ip: 10.0.0.1
+sdn_controller: 10.20.2.2
+Vlans: 
+  red:
+    id: 10
+  blue:
+    id: 20
+ports:
+ 1: [ 20 ]
+ 2: [ 10 ]
+ 3: [ 10, 20 ] 
+ 
+################ Baisc auth branch file #####################
+mgmt_ip: 10.0.0.1
+Vlans: 
+  red:
+    id: 10
+  blue:
+    id: 20
+ports:
+ 1: [ 20 ]
+ 2: [ 10 ]
+ 3: [ 10, 20 ]
+auth_server: 10.30.3.3 
+
+##### 
+#git merge --abort --> In case your are getting conflicts to clean the git history using this one.
+ 
+
+######################################## Detached HEAD ##########################################################
+
+#git checkout 13a33bc --> HEAD is detached and pointing to old one.
+#git branch stage --> To create stage barnch here graph shows HEAD is pointing to checkout branch.
+
+######################################## Git Stash ###############################################################
+
+GIT stash: To save working directory.(git stash you have save unfinished work not commit data.stash created our working area and staging area are clean)
+#git stash
+#git stash list
+#git stash list -p -> to observe the edit's for each stash.(To check what are the changes made inside file data)
+#git stash apply --> we can re-apply stash's any time.
+#git stash apply stash@{1} --> we can re-apply recent save data.
+
+
+#######################################################################################################################
+
+-> To create branch #git branch <branchname>
+-> Enter branch : #git checkout <branchname>
+-> Back to master branch : #git checkout master  --> checkout is used to switch b/w the diff branches.
+-> merge the master branch: #git merge newbranch
+-> To push the update data to repo: #git push origin master
+-> To delete local branch : #git branch -d <branchname>
+-> Check list of branches :#git branch
+-> pull the updated data : git pull http link.
+-> create and enter new branch : git checkout -b branchname
+-> To update current branch to master : git rebase master
+-> add the remote origin : git remote add origin link.
+
+Git checkout : It is remove all your local changes whatever you done.
+               you can not do undo operation once if you issue this cmd.
+               Git checkout can undo unstaged changes by pulling the previous commit's version of a file from repository's history.
+
+####################################
+
+-> Github allows you to:  . share your repositories with others.
+                          . Access other user's repositories.
+                          . Store remote copies of your repositories (github servers) as backup of your local copies.
+						              . GitHub is a hosting service for Git repositories.
+						  
+####################################   Rebase  ###################################################################
+
+-> Rebase : As an alternative to merging, you can rebase the feature branch onto master branch using the following commands:
+            #git checkout feature
+            #git rebase master
+			The major benefit of rebasing is that you get a much cleaner project history. 
+			First, it eliminates the unnecessary merge commits required by git merge.
+			Second, rebasing also results in a perfectly linear project history.
+			 
+
+############################################### Restore a deleted file ###########################################
+
+-> If the deletion has not been committed, the command below will restore the deleted file in the working tree?
+#git checkout -- <filename>
+
+-> You can get a list of all the deleted files in the working tree using the command below
+#git ls-files --deleted
+
+-> If the deletion has been committed, find the commit where it happened, then recover the file from this commit?
+
+#git checkout <commit log path>^ -- <filename>
+
+-> In case you are looking for the path of the file to recover, the following command will display a summary of all deleted files?(deletion has been committed).
+#git log --diff-filter=D --summary
+
+
+#####################  Restore a Deleted Branch in Git ###########################
+
+-> Yes, you should be able to do git reflog and find the SHA1 for the commit at the tip of your deleted branch, then just git checkout [sha].
+-> 1. If you just deleted the branch, you'll see something like this in your terminal:
+    #Deleted branch <your-branch> (was <sha>)
+	  #git checkout 28fdd37
+	  #git checkout -b <branchname>
+-> 2. To restore the branch, use: 
+      #git checkout -b <branch> <sha>
+-> 3. Find the 'sha' for the commit at the tip of your deleted branch using: 
+      #git reflog
+	  
+-> check with hash commit log using #git reflog 
+                                    #git checkout <Hashlog>
+									                  #git branch -b <deleted branch name> --> to recovery deleted branch.
+									
+
+############ Delete remote branch origin ########################
+
+#git push origin --delete <branch name>
+
+############# Cloning specific branch ############################
+
+#git clone <url of repo> -b <branch name to be cloned>
+
+
+############ Fork a repo #######################################
+
+-> A fork is a copy of a repository. 
+-> Some one else can contribute in your project.
+-> Forking a repository allows you to freely experiment with changes without affecting the original project.
+Most commonly, forks are used to : 
+
+-> Propose changes to someone else's project
+A great example of using forks to propose changes is for bug fixes. Rather than logging an issue for a bug you've found, you can:
+
+1. Fork the repository.
+2. Make the fix.
+3. Submit a pull request to the project owner.
+4. If the project owner likes your work, they might pull your fix into the original repository!
+
+-> Use someone else's project as a starting point for your own idea.
+At the heart of open source is the idea that by sharing code, we can make better, more reliable software.
+
+
+
+
+
+
+
+
+
+
+		  

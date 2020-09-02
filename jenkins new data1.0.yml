@@ -1,0 +1,149 @@
+#################################### jenkins ############################################
+
+-> Jenkins is a Continuous Integration server.
+ . Jenkins is an open source automation tool written in Java with plugins built for Continuous Integration purpose.
+ . Jenkins is used to build and test your software projects continuously making it easier for developers to integrate changes to the project
+ . It is also allows you to continuously deliver your software by integrating with a large number of testing and deployment technologies.
+ 
+ plugins: 
+  . Jenkins achieves Continuous Integration with the help of plugins.
+  . Plugins allows the integration of Various DevOps stages.
+  . If you want to integrate a particular tool, you need to install the plugins for that tool.
+  . example: Git, Maven 2 project, Amazon EC2, HTML publisher etc.
+  
+ Advantages of Jenkins include:
+ 
+  . It is an open source tool with great community support.
+  . It is easy to install.
+  . It has 1000+ plugins to ease your work. If a plugin does not exist, you can code it and share with the community.
+  . It is free of cost.
+  . It is built with Java and hence, it is portable to all the major platforms.
+
+ Freestyle Build Job:
+  . The freestyle build job is a highly flexible and easy-to-use option.
+  . You can use it for any type of project; it is easy to set up, and many of its options appear in other build jobs.
+
+
+##################################   Jenkins master and slave nodes  ################################################
+
+-> A master represents basic installation of Jenkins and handles all tasks for the build system.
+-> A slave is a system that is set up to reduce the burden of build projects from the master but delegation behavior depends on the configuration of each project.
+-> Labels: which is used while configure in the job.
+
+Install Java Open JRE or JDK: on slave machine
+#sudo apt install default-jre
+
+
+#################################  Build source code ###################################################
+
+JRE (Java Runtime Environment): 
+   . Like the base model car.
+   . JRE enables the ability to create Java Applications for different types of deployments using minimal core tools to accomplish the task.
+JDK (Java Development Kit):
+   . JDK is a fully loaded Development Kit that has everything that JRE has plus additional resources to create/secure Applications and Applets.
+   
+POM.XML : A Project Object Model or POM is the fundamental unit of work in Maven. 
+          It is an XML file that contains information about the project and configuration details used by Maven to build the project. 
+		      It contains default values for most projects.
+
+
+These files are simply zipped files using the java jar tool. These files are created for different purposes. Here is the description of these files:
+
+.jar files: The .jar files contain libraries, resources and accessories files like property files.
+
+.war files: The war file contains the web application that can be deployed on any servlet/jsp container. 
+            The .war file contains jsp, html, javascript and other files necessary for the development of web applications.
+
+
+
+These are the default life cycle phases in maven:
+
+validate: - validate the project is correct and all necessary information is available
+compile:  - compile the source code of the project
+test:     - test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+package:  - take the compiled code and package it in its distributable format, such as a JAR.
+verify:   - run any checks on results of integration tests to ensure quality criteria are met
+install:  - install the package into the local repository, for use as a dependency in other projects locally
+deploy:   - done in the build environment, copies the final package to the remote repository for sharing with other developers and projects.
+
+How Maven works is, if you run a command for any of the lifecycle phases, it executes each default life cycle phase in order, before executing the command itself.
+
+order of execution:
+
+validate >> compile >> test (optional) >> package >> verify >> install >> deploy
+
+So when you run the command mvn package, it runs the commands for all lifecycle phases till package
+
+validate >> compile >> test (optional) >> package
+
+And as for mvn install, it runs the commands for all lifecycle phases till install, which includes package as well
+
+validate >> compile >> test (optional) >> package >> verify >> install
+		  
+############## How are “mvn clean package” and “mvn clean install” different? ######################
+clean:   That means they'll remove the target folder
+package: will compile your code and also package it. 
+         For example, if your pom says the project is a jar, it will create a jar for you when you package it and put it somewhere in the target directory (by default).
+install: will compile and package, but it will also put the package in your local repository. 
+         This will make it so other projects can refer to it and grab it from your local repository.
+
+
+################################ jenkins usermanagement ############################
+
+-> Jenkins doesn't have any database but it is having config.xml file it will store the all configurations.
+-> Choose jenkins data base automatically create the users.
+  . Legacy mode: user's have read permissions only.
+  
+-> Delegate to servlet container --> tomcat user's can able to access the jenkins
+-> Matrix-based security: we can give the specific user to specific permissions.
+-> Matrix based strategy (If you have multiple users with different permissions) for the Authorization.
+  
+
+############################### Manage user roles ###################################  
+  
+  . Create new users
+  . Configure users
+  . Create and Manage user roles - we need to install Role-based Authorization Strategy Plugin.	
+    
+  
+-> In Jenkins I have two different projects and two users I want to authorize:
+
+User1 can only view, build, deploy Project1.
+
+User2 can only view, build, deploy Project2 ----> using roles we can do it.
+   
+Authorization:
+  . Matrix based security: we can give the specific user to specific permissions.
+  
+   
+########## Changing the Jenkins home directory on Ubuntu #################
+
+1. I would suggest editing the /etc/default/jenkins
+#vim /etc/default/jenkins
+And changing the $JENKINS_HOME variable (around line 23) to
+JENKINS_HOME=/home/jenkins
+
+2.Then restart the Jenkins with usual
+#/etc/init.d/jenkins start 
+
+################  Build ##########################
+#apt install openjdk-7-jdk --> install java pkg.
+
+Need to install jre and jdk pkg's: 
+ 
+#sudo apt install default-jdk
+#sudo apt install default-jre
+Maven Integration --> Maven plugin.
+
+https://www.vultr.com/docs/how-to-install-apache-maven-on-ubuntu-16-04 ----> install maven pkg.
+
+#vim /etc/profile.d/apache-maven.sh
+
+	export M2_HOME=/opt/maven
+	export PATH=${M2_HOME}/bin:${PATH}
+	export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+	export PATH=${JAVA_HOME}/bin:${PATH}
+
+
+
+
